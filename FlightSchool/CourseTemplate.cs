@@ -85,13 +85,13 @@ namespace FlightSchool
 
             Variables = variables;
 
-            id = MathParsing.ReplaceMathVariables(ConfigNodeUtils.GetValueOrDefault(source, "id"), variables);
-            name = MathParsing.ReplaceMathVariables(ConfigNodeUtils.GetValueOrDefault(source, "name"), variables);
-            description = MathParsing.ReplaceMathVariables(ConfigNodeUtils.GetValueOrDefault(source, "description"), variables);
+            id = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "id"), variables);
+            name = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "name"), variables);
+            description = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "description"), variables);
 
-            bool.TryParse(MathParsing.ReplaceMathVariables(ConfigNodeUtils.GetValueOrDefault(source, "Available", "true"), variables), out Available);
+            bool.TryParse(MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "Available", "true"), variables), out Available);
 
-            List<string> tmpList = MathParsing.ReplaceMathVariables(ConfigNodeUtils.GetValueOrDefault(source, "activePreReqs"), variables).Split(',').ToList();
+            List<string> tmpList = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "activePreReqs"), variables).Split(',').ToList();
             tmpList.ForEach((s) => s.Trim());
             if (!tmpList.TrueForAll(s => s == ""))
                 activePreReqs = tmpList.ToArray();
@@ -99,14 +99,14 @@ namespace FlightSchool
                 activePreReqs = new string[] { };
             //activePreReqs = tmpList.ToArray();
 
-            tmpList = MathParsing.ReplaceMathVariables(ConfigNodeUtils.GetValueOrDefault(source, "preReqs"), variables).Split(',').ToList();
+            tmpList = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "preReqs"), variables).Split(',').ToList();
             tmpList.ForEach((s) => s.Trim());
             if (!tmpList.TrueForAll(s => s == ""))
                 preReqs = tmpList.ToArray();
             else
                 preReqs = new string[] { };
 
-            tmpList = MathParsing.ReplaceMathVariables(ConfigNodeUtils.GetValueOrDefault(source, "conflicts"), variables).Split(',').ToList();
+            tmpList = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "conflicts"), variables).Split(',').ToList();
             tmpList.ForEach((s) => s.Trim());
             //conflicts = tmpList.ToArray();
             if (!tmpList.TrueForAll(s => s == ""))
@@ -114,10 +114,10 @@ namespace FlightSchool
             else
                 conflicts = new string[] { };
 
-            time = MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(source, "time", "0"), variables);
-            bool.TryParse(MathParsing.ReplaceMathVariables(ConfigNodeUtils.GetValueOrDefault(source, "required", "false"), variables), out required);
+            time = MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "time", "0"), variables);
+            bool.TryParse(MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "required", "false"), variables), out required);
 
-            string repeatStr = MathParsing.ReplaceMathVariables(ConfigNodeUtils.GetValueOrDefault(source, "required", "false"), variables).Trim();
+            string repeatStr = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "required", "false"), variables).Trim();
             switch (repeatStr)
             {
                 case "NEVER": repeatable = RepeatMode.NEVER; break;
@@ -126,7 +126,7 @@ namespace FlightSchool
                 default: repeatable = RepeatMode.NEVER; break;
             }
 
-            tmpList = MathParsing.ReplaceMathVariables(ConfigNodeUtils.GetValueOrDefault(source, "classes"), variables).Split(',').ToList();
+            tmpList = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "classes"), variables).Split(',').ToList();
             tmpList.ForEach((s) => s.Trim());
             //classes = tmpList.ToArray();
             if (!tmpList.TrueForAll(s => s == ""))
@@ -134,33 +134,46 @@ namespace FlightSchool
             else
                 classes = new string[] { };
 
-            minLevel = (int)(MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(source, "minLevel", "0"), variables));
-            maxLevel = (int)(MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(source, "maxLevel", "5"), variables));
+            minLevel = (int)(MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "minLevel", "0"), variables));
+            maxLevel = (int)(MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "maxLevel", "5"), variables));
 
-            seatMax = (int)(MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(source, "seatMax", "-1"), variables));
-            seatMin = (int)(MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(source, "seatMin", "0"), variables));
+            seatMax = (int)(MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "seatMax", "-1"), variables));
+            seatMin = (int)(MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "seatMin", "0"), variables));
 
-            costBase = MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(source, "costBase", "0"), variables);
-            costSeat = MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(source, "costSeat", "0"), variables);
+            costBase = MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "costBase", "0"), variables);
+            costSeat = MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "costSeat", "0"), variables);
 
-            costTeacher = MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(source, "costTeacher", "0"), variables);
-            tmpList = MathParsing.ReplaceMathVariables(ConfigNodeUtils.GetValueOrDefault(source, "teachClasses"), variables).Split(',').ToList();
+            costTeacher = MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "costTeacher", "0"), variables);
+            tmpList = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "teachClasses"), variables).Split(',').ToList();
             tmpList.ForEach((s) => s.Trim());
             if (!tmpList.TrueForAll(s => s == ""))
                 teachClasses = tmpList.ToArray();
             else
                 teachClasses = new string[] { };
 
-            teachMinLevel = (int)(MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(source, "teachMinLevel", "0"), variables));
+            teachMinLevel = (int)(MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "teachMinLevel", "0"), variables));
 
             //get the REWARD nodes and replace any variables in there too
             Rewards = source.GetNodes("REWARD");
             foreach (ConfigNode node in Rewards)
-                ConfigNodeUtils.ReplaceValuesInNode(node, variables);
+                ReplaceValuesInNode(node, variables);
 
           /*  Expiry = source.GetNodes("EXPIRY");
             foreach (ConfigNode node in Expiry)
-                ConfigNodeUtils.ReplaceValuesInNode(node, variables);*/
+                ConfigNodeExtensions.ReplaceValuesInNode(node, variables);*/
+        }
+
+        public static void ReplaceValuesInNode(ConfigNode source, Dictionary<string, string> variables)
+        {
+            foreach (ConfigNode.Value val in source.values)
+            {
+                val.value = MathParsing.ReplaceMathVariables("FlightSchool", val.value, variables);
+            }
+
+            for (int i = 0; i < source.nodes.Count; i++)
+            {
+                ReplaceValuesInNode(source.nodes[i], variables); //recurse through all attached nodes
+            }
         }
     }
 }

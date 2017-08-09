@@ -21,12 +21,7 @@ namespace FlightSchool
 
         FSGUI GUI = new FSGUI();
 
-        public void Awake()
-        {
-            RenderingManager.AddToPostDrawQueue(0, OnDraw);
-        }
-
-        private void OnDraw()
+        private void OnGUI()
         {
             GUI.SetGUIPositions(OnWindow);
         }

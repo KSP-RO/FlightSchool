@@ -54,11 +54,11 @@ namespace FlightSchool
 
         public void FromConfigNode(ConfigNode node)
         {
-            double.TryParse(ConfigNodeUtils.GetValueOrDefault(node, "elapsedTime", "0"), out elapsedTime);
-            bool.TryParse(ConfigNodeUtils.GetValueOrDefault(node, "Started", "true"), out Started);
-            bool.TryParse(ConfigNodeUtils.GetValueOrDefault(node, "Completed", "false"), out Completed);
+            double.TryParse(ConfigNodeExtensions.GetValueOrDefault(node, "elapsedTime", "0"), out elapsedTime);
+            bool.TryParse(ConfigNodeExtensions.GetValueOrDefault(node, "Started", "true"), out Started);
+            bool.TryParse(ConfigNodeExtensions.GetValueOrDefault(node, "Completed", "false"), out Completed);
 
-            string teacherName = ConfigNodeUtils.GetValueOrDefault(node, "teacher", "NA");
+            string teacherName = ConfigNodeExtensions.GetValueOrDefault(node, "teacher", "NA");
             if (teacherName != "NA" && HighLogic.CurrentGame.CrewRoster.Exists(teacherName))
             {
                 Teacher = HighLogic.CurrentGame.CrewRoster[teacherName];
@@ -84,7 +84,7 @@ namespace FlightSchool
             {
                 foreach (ConfigNode.Value val in variableNode.values)
                 {
-                    Utilities.AddOrReplaceInDictionary(Variables, val.name, val.value);
+                    Variables[val.name] = val.value;
                 }
             }
 
@@ -211,12 +211,12 @@ namespace FlightSchool
             {
                 foreach (KeyValuePair<string, string> kvp in addlVariables)
                 {
-                    Utilities.AddOrReplaceInDictionary<string, string>(Variables, kvp.Key, kvp.Value);
+                    Variables[kvp.Key] = kvp.Value;
                 }
             }
             if (Teacher != null)
             {
-                Utilities.AddOrReplaceInDictionary<string, string>(Variables, "TeachLvl", Teacher.experienceLevel.ToString());
+                Variables["TeachLvl"] = Teacher.experienceLevel.ToString();
                 
                // Variables.Add("TeachLvl", Teacher.experienceLevel.ToString());
                 int classID = -1;
@@ -226,22 +226,22 @@ namespace FlightSchool
                     classID = 1;
                 else if (Teacher.trait == "Scientist")
                     classID = 2;
-                Utilities.AddOrReplaceInDictionary<string, string>(Variables, "TeachClass", classID.ToString());
+                Variables["TeachClass"] = classID.ToString();
                 //Variables.Add("TeachClass", classID.ToString());
             }
-            Utilities.AddOrReplaceInDictionary<string, string>(Variables, "FilledSeats", Students.Count.ToString());
+            Variables["FilledSeats"] = Students.Count.ToString();
            // UnityEngine.Debug.Log("FilledSeats: " + Variables["FilledSeats"]);
             //Variables.Add("FilledSeats", Students.Count.ToString());
 
 
-           // UnityEngine.Debug.Log(ConfigNodeUtils.GetValueOrDefault(sourceNode, "costBase", "0"));
+           // UnityEngine.Debug.Log(ConfigNodeExtensions.GetValueOrDefault(sourceNode, "costBase", "0"));
             //recalculate the baseCost, seatCost, and teacherCost
-            costBase = MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(sourceNode, "costBase", "0"), Variables);
-            costSeat = MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(sourceNode, "costSeat", "0"), Variables);
+            costBase = MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(sourceNode, "costBase", "0"), Variables);
+            costSeat = MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(sourceNode, "costSeat", "0"), Variables);
             if (Teacher != null)
                 costTeacher = 0;
             else
-                costTeacher = MathParsing.ParseMath(ConfigNodeUtils.GetValueOrDefault(sourceNode, "costTeacher", "0"), Variables);
+                costTeacher = MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(sourceNode, "costTeacher", "0"), Variables);
 
             double cost = costBase + costTeacher + (costSeat * Students.Count);
           //  UnityEngine.Debug.Log("Course cost: " + cost);
