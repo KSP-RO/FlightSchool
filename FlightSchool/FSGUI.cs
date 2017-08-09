@@ -93,7 +93,7 @@ namespace FlightSchool
                                 validTeachers.Add(pcm);
                         }
 
-                        DialogGUIBase[] options = new DialogGUIButton[validTeachers.Count+2];
+                        DialogGUIBase[] options = new DialogGUIBase[validTeachers.Count+2];
                         options[0] = new DialogGUIFlexibleSpace();
                         for (int i=0; i< validTeachers.Count; i++)
                         {
@@ -207,9 +207,13 @@ namespace FlightSchool
                         GUILayout.Label(student.name+": "+student.trait+" "+student.experienceLevel);
                         if (GUILayout.Button("X", GUILayout.ExpandWidth(false)))
                         {
-                            DialogGUIBase[] options = new DialogGUIButton[3];
+                            DialogGUIBase[] options = new DialogGUIBase[3];
                             options[0] = new DialogGUIFlexibleSpace();
-                            options[1] = new DialogGUIButton("Yes", () => { selectedCourse.Students.Remove(student); student.rosterStatus = ProtoCrewMember.RosterStatus.Available; });
+                            options[1] = new DialogGUIButton("Yes", () =>
+                                {
+                                    selectedCourse.Students.Remove(student);
+                                    student.inactive = false;
+                                });
                             options[2] = new DialogGUIButton("No", () => { });
                             
                             MultiOptionDialog diag = new MultiOptionDialog("Are you sure you want "+student.name+ " to drop this course?", "Drop Course?",
@@ -229,7 +233,7 @@ namespace FlightSchool
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button("Cancel Course", GUILayout.ExpandWidth(false)))
                     {
-                        DialogGUIBase[] options = new DialogGUIButton[3];
+                        DialogGUIBase[] options = new DialogGUIBase[3];
                         options[0] = new DialogGUIFlexibleSpace();
                         options[1] = new DialogGUIButton("Yes", () => { selectedCourse.CompleteCourse(); FlightSchool.Instance.ActiveCourses.Remove(selectedCourse); selectedCourse = null; });
                         options[2] = new DialogGUIButton("No", () => { });

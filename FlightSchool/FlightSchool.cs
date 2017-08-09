@@ -31,10 +31,14 @@ namespace FlightSchool
             GUI.DrawGUIs(windowID);
         }
 
+        protected void Awake()
+        {
+            Instance = this;
+        }
 
         public void Start()
         {
-            Instance = this;
+            
             FindAllCourseConfigs(); //find all applicable configs
             GenerateOfferedCourses(); //turn the configs into offered courses
 
@@ -42,6 +46,9 @@ namespace FlightSchool
 
         public void FixedUpdate()
         {
+            if (HighLogic.CurrentGame == null)
+                return;
+
             double UT = Planetarium.GetUniversalTime();
             if (LastUT <= 0)
                 LastUT = UT;
@@ -63,14 +70,9 @@ namespace FlightSchool
         {
             CourseTemplates.Clear();
             //find all configs and save them
-            string defaultPath = KSPUtil.ApplicationRootPath + "/GameData/FlightSchool/Courses/";
-            foreach (string file in Directory.GetFiles(defaultPath, "*.cfg"))
+            foreach (ConfigNode course in GameDatabase.Instance.GetConfigNodes("FS_COURSE"))
             {
-                ConfigNode node = ConfigNode.Load(file);
-                foreach (ConfigNode course in node.GetNodes("FS_COURSE"))
-                {
-                    CourseTemplates.Add(new CourseTemplate(course));
-                }
+                CourseTemplates.Add(new CourseTemplate(course));
             }
             Debug.Log("[FS] Found " + CourseTemplates.Count + " courses.");
             //fire an event to let other mods add their configs
@@ -81,7 +83,7 @@ namespace FlightSchool
             //convert the saved configs to course offerings
             foreach (CourseTemplate template in CourseTemplates)
             {
-                CourseTemplate duplicate = new CourseTemplate(template.sourceNode); //creates a duplicate so the initial template is preserved
+                CourseTemplate duplicate = new CourseTemplate(template.sourceNode, true); //creates a duplicate so the initial template is preserved
                 duplicate.PopulateFromSourceNode(new Dictionary<string, string>());
                 if (duplicate.Available)
                     OfferedCourses.Add(duplicate);

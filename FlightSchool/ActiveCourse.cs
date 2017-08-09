@@ -95,7 +95,7 @@ namespace FlightSchool
 
         public bool MeetsTeacherReqs(ProtoCrewMember teacher)
         {
-            return (teacher.rosterStatus == ProtoCrewMember.RosterStatus.Available && teacher.experienceLevel >= teachMinLevel && (teachClasses.Length == 0 || teachClasses.Contains(teacher.trait)) && !Students.Contains(teacher));
+            return (teacher.rosterStatus == ProtoCrewMember.RosterStatus.Available && !teacher.inactive && teacher.experienceLevel >= teachMinLevel && (teachClasses.Length == 0 || teachClasses.Contains(teacher.trait)) && !Students.Contains(teacher));
         }
 
         public void SetTeacher(ProtoCrewMember teacher)
@@ -110,7 +110,7 @@ namespace FlightSchool
 
         public bool MeetsStudentReqs(ProtoCrewMember student)
         {
-            return (student.type == (ProtoCrewMember.KerbalType.Crew) && (seatMax <= 0 || Students.Count < seatMax) && student.rosterStatus == ProtoCrewMember.RosterStatus.Available && student.experienceLevel >= minLevel &&
+            return (student.type == (ProtoCrewMember.KerbalType.Crew) && (seatMax <= 0 || Students.Count < seatMax) && !student.inactive && student.rosterStatus == ProtoCrewMember.RosterStatus.Available && student.experienceLevel >= minLevel &&
                 student.experienceLevel <= maxLevel && (classes.Length == 0 || classes.Contains(student.trait)) && !Students.Contains(student) && student != Teacher);
         }
         public void AddStudent(ProtoCrewMember student)
@@ -165,12 +165,30 @@ namespace FlightSchool
             //assign rewards to all kerbals and set them to free
             if (Completed)
             {
-                //assign rewards
-            }
+                foreach (ProtoCrewMember student in Students)
+                {
+                    if (student == null)
+                        continue;
 
-            Teacher.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+                    if (rewardXP != 0)
+                        student.ExtraExperience += rewardXP;
+
+                    if (RewardLog != null)
+                    {
+                        student.flightLog.AddFlight();
+                        foreach (ConfigNode.Value v in RewardLog.values)
+                        {
+                            string[] s = v.value.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            student.flightLog.AddEntry(s[0], s.Length == 1 ? null : s[1]);
+                        }
+                    }
+                }
+            }
+            if (Teacher != null)
+                Teacher.inactive = false;
+
             foreach (ProtoCrewMember student in Students)
-                student.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+                student.inactive = false;
 
             //fire an event
         }
@@ -197,9 +215,10 @@ namespace FlightSchool
             Funding.Instance.AddFunds(-cost, TransactionReasons.None);
 
             Started = true;
-            Teacher.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
+            if (Teacher != null)
+                Teacher.SetInactive(time + 1d);
             foreach (ProtoCrewMember student in Students)
-                student.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
+                student.SetInactive(time + 1d);
 
             return true;
             //fire an event

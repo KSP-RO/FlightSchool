@@ -61,12 +61,21 @@ namespace FlightSchool
         public string[] teachClasses = { }; //which classes are valid teachers (empty == all)
         public int teachMinLevel = 0; //minimum level for the teacher
 
-        public ConfigNode[] Rewards = { }; //The list of rewards for completing the course
+        public int rewardXP = 0; //pure XP reward
+        public ConfigNode RewardLog = null; //the flight log to insert
        // public ConfigNode[] Expiry = { }; //The list of ways that course experience can be lost
 
         public CourseTemplate(ConfigNode source)
         {
             sourceNode = source;
+        }
+
+        public CourseTemplate(ConfigNode source, bool copy)
+        {
+            if (copy)
+                sourceNode = source.CreateCopy();
+            else
+                sourceNode = source;
         }
 
         public CourseTemplate()
@@ -89,7 +98,7 @@ namespace FlightSchool
             name = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "name"), variables);
             description = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "description"), variables);
 
-            bool.TryParse(MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "Available", "true"), variables), out Available);
+            bool.TryParse(MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "Available", "True"), variables), out Available);
 
             List<string> tmpList = MathParsing.ReplaceMathVariables("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "activePreReqs"), variables).Split(',').ToList();
             tmpList.ForEach((s) => s.Trim());
@@ -154,13 +163,34 @@ namespace FlightSchool
             teachMinLevel = (int)(MathParsing.ParseMath("FlightSchool", ConfigNodeExtensions.GetValueOrDefault(source, "teachMinLevel", "0"), variables));
 
             //get the REWARD nodes and replace any variables in there too
-            Rewards = source.GetNodes("REWARD");
-            foreach (ConfigNode node in Rewards)
-                ReplaceValuesInNode(node, variables);
+            ConfigNode r = source.GetNode("REWARD");
+            if (r != null)
+            {
+                ReplaceValuesInNode(r, variables);
 
-          /*  Expiry = source.GetNodes("EXPIRY");
-            foreach (ConfigNode node in Expiry)
-                ConfigNodeExtensions.ReplaceValuesInNode(node, variables);*/
+                RewardLog = r.GetNode("FLIGHTLOG");
+                r.TryGetValue("XPAmt", ref rewardXP);
+            }
+
+            /*  Expiry = source.GetNodes("EXPIRY");
+              foreach (ConfigNode node in Expiry)
+                  ConfigNodeExtensions.ReplaceValuesInNode(node, variables);*/
+
+            /*string logStr = "Course created";
+            logStr += "\nID: " + id;
+            logStr += "\nName: " + name;
+            logStr += "\nAvailable: " + Available;
+            logStr += "\nprereqs: " + preReqs.Length;
+            logStr += "\ntime: " + time;
+            logStr += "\nrepeatable: " + repeatable;
+            logStr += "\nteachMin: " + teachMinLevel;
+            logStr += "\nXP: " + rewardXP;
+            logStr += "\nLog: ";
+            if (RewardLog != null)
+                foreach (ConfigNode.Value v in RewardLog.values)
+                    logStr += "\n" + v.value;
+
+            UnityEngine.Debug.Log(logStr);*/
         }
 
         public static void ReplaceValuesInNode(ConfigNode source, Dictionary<string, string> variables)

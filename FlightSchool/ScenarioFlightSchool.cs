@@ -14,6 +14,9 @@ namespace FlightSchool
 
             ConfigNode FSData = node.GetNode("FlightSchoolData");
 
+            if (FSData == null)
+                return;
+
             //load all the active courses
             FlightSchool.Instance.ActiveCourses.Clear();
             foreach (ConfigNode courseNode in FSData.GetNodes("ACTIVE_COURSE"))
