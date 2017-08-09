@@ -93,15 +93,20 @@ namespace FlightSchool
                                 validTeachers.Add(pcm);
                         }
 
-                        DialogOption[] options = new DialogOption[validTeachers.Count+1];
+                        DialogGUIBase[] options = new DialogGUIButton[validTeachers.Count+2];
+                        options[0] = new DialogGUIFlexibleSpace();
                         for (int i=0; i< validTeachers.Count; i++)
                         {
                             ProtoCrewMember pcm = validTeachers[i];
-                            options[i] = new DialogOption(pcm.name + ": " + pcm.trait + " " + pcm.experienceLevel, () => { selectedCourse.SetTeacher(pcm); totalCost = selectedCourse.CalculateCost(); });
+                            options[i+1] = new DialogGUIButton(pcm.name + ": " + pcm.trait + " " + pcm.experienceLevel, () => { selectedCourse.SetTeacher(pcm); totalCost = selectedCourse.CalculateCost(); });
                         }
-                        options[validTeachers.Count] = new DialogOption("Guest Lecturer", () => { selectedCourse.Teacher = null; totalCost = selectedCourse.CalculateCost(); });
-                        MultiOptionDialog diag = new MultiOptionDialog("Select a kerbal to lead this course:", "Select Teacher", null, options);
-                        PopupDialog.SpawnPopupDialog(diag, false, GUI.skin);
+                        options[validTeachers.Count+1] = new DialogGUIButton("Guest Lecturer", () => { selectedCourse.Teacher = null; totalCost = selectedCourse.CalculateCost(); });
+                        MultiOptionDialog diag = new MultiOptionDialog("Select a kerbal to lead this course:", "Select Teacher",
+                            HighLogic.UISkin,
+                            new Rect(0.5f, 0.5f, 150f, 60f),
+                            new DialogGUIFlexibleSpace(),
+                            new DialogGUIVerticalLayout(options));
+                        PopupDialog.SpawnPopupDialog(diag, false, HighLogic.UISkin);
                     }
                     GUILayout.FlexibleSpace();
                     GUILayout.EndHorizontal();
@@ -202,12 +207,17 @@ namespace FlightSchool
                         GUILayout.Label(student.name+": "+student.trait+" "+student.experienceLevel);
                         if (GUILayout.Button("X", GUILayout.ExpandWidth(false)))
                         {
-                            DialogOption[] options = new DialogOption[2];
-                            options[0] = new DialogOption("Yes", () => {selectedCourse.Students.Remove(student); student.rosterStatus = ProtoCrewMember.RosterStatus.Available;});
-                            options[1] = new DialogOption("No", ()=>{});
-
-                            MultiOptionDialog diag = new MultiOptionDialog("Are you sure you want "+student.name+ " to drop this course?", "Drop Course?", null, options);
-                            PopupDialog.SpawnPopupDialog(diag, false, GUI.skin);
+                            DialogGUIBase[] options = new DialogGUIButton[3];
+                            options[0] = new DialogGUIFlexibleSpace();
+                            options[1] = new DialogGUIButton("Yes", () => { selectedCourse.Students.Remove(student); student.rosterStatus = ProtoCrewMember.RosterStatus.Available; });
+                            options[2] = new DialogGUIButton("No", () => { });
+                            
+                            MultiOptionDialog diag = new MultiOptionDialog("Are you sure you want "+student.name+ " to drop this course?", "Drop Course?",
+                                HighLogic.UISkin,
+                                new Rect(0.5f, 0.5f, 150f, 60f),
+                                new DialogGUIFlexibleSpace(),
+                                new DialogGUIVerticalLayout(options));
+                            PopupDialog.SpawnPopupDialog(diag, false, HighLogic.UISkin);
 
                             i--;
                         }
@@ -219,12 +229,17 @@ namespace FlightSchool
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button("Cancel Course", GUILayout.ExpandWidth(false)))
                     {
-                        DialogOption[] options = new DialogOption[2];
-                        options[0] = new DialogOption("Yes", () => { selectedCourse.CompleteCourse(); FlightSchool.Instance.ActiveCourses.Remove(selectedCourse); selectedCourse = null; });
-                        options[1] = new DialogOption("No", ()=>{});
+                        DialogGUIBase[] options = new DialogGUIButton[3];
+                        options[0] = new DialogGUIFlexibleSpace();
+                        options[1] = new DialogGUIButton("Yes", () => { selectedCourse.CompleteCourse(); FlightSchool.Instance.ActiveCourses.Remove(selectedCourse); selectedCourse = null; });
+                        options[2] = new DialogGUIButton("No", () => { });
 
-                        MultiOptionDialog diag = new MultiOptionDialog("Are you sure you want to cancel this course?", "Cancel Course?", null, options);
-                        PopupDialog.SpawnPopupDialog(diag, false, GUI.skin);
+                        MultiOptionDialog diag = new MultiOptionDialog("Are you sure you want to cancel this course?", "Cancel Course?",
+                            HighLogic.UISkin,
+                            new Rect(0.5f, 0.5f, 150f, 60f),
+                            new DialogGUIFlexibleSpace(),
+                            new DialogGUIVerticalLayout(options));
+                        PopupDialog.SpawnPopupDialog(diag, false, HighLogic.UISkin);
                     }
                     GUILayout.FlexibleSpace();
                     GUILayout.EndHorizontal();
